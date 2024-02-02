@@ -1,6 +1,11 @@
 install.packages("tidyverse")
 install.packages("corrplot")
 install.packages("tidyr")
+install.packages("caret")
+install.packages("MASS")
+install.packages("devtools")
+install.packages("scales")
+install.packages("glmnet")
 library(tidyverse)
 library(corrplot)
 library(tidyr)
@@ -55,7 +60,6 @@ corrplot(cor_matrix,)
 data$Quality <- as.numeric(data$Quality == "good")
 
 # Razdvajanje skupa na trening i testni
-install.packages("caret")
 library(caret)
 
 indexes = createDataPartition(data$Quality, p = 0.8, list = F)
@@ -73,11 +77,9 @@ confusionMatrix(data=as.factor(predictions), reference=as.factor(data_test$Quali
 
 # 3.a Linearna Diskriminantna analiza (Linearna Diskriminantna analiza nije dobra za ovaj dataset
 # Jer ciljna varijabla Quality ima samo dvije kategorije sto znaci da ce LDA outputat samo 1 dimenziju)
-install.packages("MASS")
 library(MASS)
 
 # Razdvajanje skupa na trening i testni
-install.packages("caret")
 library(caret)
 indexes = createDataPartition(data$Quality, p = 0.8, list = F)
 data_train = data[indexes, ]
@@ -93,7 +95,7 @@ confusionMatrix(data=as.factor(predictions$class), reference=as.factor(data_test
 # 3.b Analiza glavnih komponenti (Napravljena je i Analiza glavnih komponenti jer je LDA loš s ovim datasetom)
 
 # Analiza glavnih komponenti
-pca_result <- prcomp(data[-8], center=TRUE, scale=TRUE)
+pca_result <- prcomp(data[-8], center=FALSE, scale=FALSE) # Skup podataka dolazi već skaliran i centriran
 
 # Pregled modela
 summary(pca_result)
@@ -110,10 +112,8 @@ plot(cumsum(prop_var), xlab = "Number of Principal Components", ylab = "Cumulati
 plot(prop_var, xlab = "Principal Component", ylab = "Proportion of Variance Explained", type = "s")
 
 #Izrada ggbiplota, ali je loš jer prve dvije komponente objašnjavaju samo 42.5% varijance
-install.packages('devtools')
 library(devtools)
 install_github('vqv/ggbiplot')
-install.packages("scales")
 library(ggbiplot)
 
 
@@ -126,15 +126,13 @@ ggbiplot(pca_result,
 
 # 4. Stepwise odabir modela prema naprijed
 
-install.packages("MASS")
 library(MASS) 
-install.packages("caret")
 library(caret)
 
 # Razdvajanje skupa na trening i testni
-indexes = createDataPartition(scaled_data$Quality, p = 0.8, list = F)
-data_train = scaled_data[indexes, ]
-data_test = scaled_data[-indexes, ]
+indexes = createDataPartition(data$Quality, p = 0.8, list = F)
+data_train = data[indexes, ]
+data_test = data[-indexes, ]
 
 
 # model logističke regresije
@@ -156,7 +154,6 @@ confusionMatrix(data=as.factor(predictions), reference=as.factor(data_test$Quali
 
 
 # 5. Ridge regresija
-install.packages("glmnet")
 library(glmnet)
 
 
