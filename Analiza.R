@@ -116,11 +116,11 @@ library(devtools)
 install_github('vqv/ggbiplot')
 library(ggbiplot)
 
-
+       
 ggbiplot(pca_result,
          obs.scale = 1,
          var.scale = 1,
-         groups = data$Quality)
+         groups = as.factor(original_data$Quality))
 
 
 
