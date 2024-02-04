@@ -153,41 +153,41 @@ predictions <- ifelse(predictions > 0.5, 1, 0)
 confusionMatrix(data=as.factor(predictions), reference=as.factor(data_test$Quality))
 
 
+
 # 5. Ridge regresija
 library(glmnet)
 library(caret)
 
 # Razdvajanje skupa na trening i testni
-indeksi = createDataPartition(data$Quality, p = 0.8, list = FALSE)
-data_trening = data[indeksi, ]
-data_test = data[-indeksi, ]
+indexes = createDataPartition(data$Quality, p = 0.8, list = FALSE)
+data_train = data[indexes, ]
+data_test = data[-indexes, ]
 
 # Pretvaranje podataka u matrice
-x_trening <- as.matrix(data_trening[, -ncol(data_trening)])
+x_train <- as.matrix(data_train[, -ncol(data_train)])
 x_test <- as.matrix(data_test[, -ncol(data_test)])
 
 # Odvajanje ciljne varijable
-y_trening <- data_trening$Quality
+y_train <- data_train$Quality
 y_test <- data_test$Quality
 
 # Izgradnja modela Ridge regresije korištenjem unakrsne validacije
-ridge_model <- cv.glmnet(x_trening, y_trening, alpha = 0)  # alpha = 0 za Ridge regresiju
+ridge_model <- cv.glmnet(x_train, y_train, alpha = 0)  # alpha = 0 za Ridge regresiju
 optimalni_lambda <- ridge_model$lambda.min
 
 # Predviđanja na testnom skupu
-predikcije <- predict(ridge_model, newx = x_test, s = optimalni_lambda, type = "response")
-predikcije_klasa <- as.numeric(predikcije > 0.5)
+predictions <- predict(ridge_model, newx = x_test, s = optimalni_lambda, type = "response")
+predictions <- as.numeric(predictions > 0.5)
 
 # Izračunavanje matrice konfuzije
-matrica_konfuzije <- table(Stvarno = y_test, Predviđeno = predikcije_klasa)
+confusionMatrix <- table(Stvarno = y_test, Predviđeno = predictions)
 
 # Izračunavanje točnosti modela
-tocnost <- sum(diag(matrica_konfuzije)) / sum(matrica_konfuzije)
+accuracy <- sum(diag(confusionMatrix)) / sum(confusionMatrix)
 
 # Ispis rezultata
-print(matrica_konfuzije)
-print(paste("Točnost: ", tocnost))
-
+print(confusionMatrix)
+print(paste("Accuracy: ", accuracy))
 
 
 
